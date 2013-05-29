@@ -59,7 +59,7 @@ public class UserData extends HttpServlet {
            user.setIdtype(object.get("idtype").toString());
            user.setPhone(object.getString("phone").toString());
            user.setEmail(object.getString("email").toString());
-                  user.setEmail(object.getString("email").toString());
+           user.setEmail(object.getString("email").toString());
 
            
            
