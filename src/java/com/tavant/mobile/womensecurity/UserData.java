@@ -33,8 +33,7 @@ public class UserData extends HttpServlet {
     private Userdata user=null;
 
     
-    
-    
+
     /**
      * Processes requests for both HTTP
      * <code>PUT</code> and
@@ -187,10 +186,5 @@ public class UserData extends HttpServlet {
                  return false;
 
   }   
-
    
-    
-    
-    
-    
 }
