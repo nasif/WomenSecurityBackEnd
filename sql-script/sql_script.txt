@@ -1,3 +1,13 @@
+create database womensecurity;
+
+CREATE  TABLE IF NOT EXISTS `womensecurity`.`locationdata` (
+  `id` INT NULL AUTO_INCREMENT ,
+  `userdataid` INT NOT NULL ,
+  `latitude` VARCHAR(60) NOT NULL ,
+  `longitude` VARCHAR(60) NOT NULL ,
+  PRIMARY KEY (`id`),KEY (`userdataid`))
+ENGINE = InnoDB;
+
 CREATE  TABLE IF NOT EXISTS `womensecurity`.`userdata` (
   `id` INT NULL AUTO_INCREMENT ,
   `userid` VARCHAR(75) NOT NULL ,
@@ -9,22 +19,8 @@ CREATE  TABLE IF NOT EXISTS `womensecurity`.`userdata` (
   `osname` TEXT NOT NULL ,
   `authtoken` VARCHAR(512) NULL ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `phone_UNIQUE` (`phone` ASC) ,
-  INDEX `id_idx` (`id` ASC) ,
-  CONSTRAINT `id`
     FOREIGN KEY (`id` )
     REFERENCES `womensecurity`.`locationdata` (`userdataid` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-
-CREATE  TABLE IF NOT EXISTS `womensecurity`.`locationdata` (
-  `id` INT NULL AUTO_INCREMENT ,
-  `userdataid` INT NOT NULL ,
-  `latitude` VARCHAR(60) NOT NULL ,
-  `longitude` VARCHAR(60) NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `userdataid_UNIQUE` (`userdataid` ASC) )
-ENGINE = InnoDB
-
-
+ENGINE = InnoDB;

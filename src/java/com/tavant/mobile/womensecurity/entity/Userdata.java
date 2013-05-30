@@ -11,9 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -21,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author nasif
+ * @author Tavant
  */
 @Entity
 @Table(name = "userdata")
@@ -32,7 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Userdata.findByUserid", query = "SELECT u FROM Userdata u WHERE u.userid = :userid"),
     @NamedQuery(name = "Userdata.findByPhone", query = "SELECT u FROM Userdata u WHERE u.phone = :phone"),
     @NamedQuery(name = "Userdata.findByEmail", query = "SELECT u FROM Userdata u WHERE u.email = :email"),
-    @NamedQuery(name = "Userdata.findByDevicetoken", query = "SELECT u FROM Userdata u WHERE u.devicetoken = :devicetoken"),
+    @NamedQuery(name = "Userdata.findByGcmid", query = "SELECT u FROM Userdata u WHERE u.gcmid = :gcmid"),
     @NamedQuery(name = "Userdata.findByApptype", query = "SELECT u FROM Userdata u WHERE u.apptype = :apptype"),
     @NamedQuery(name = "Userdata.findByAuthtoken", query = "SELECT u FROM Userdata u WHERE u.authtoken = :authtoken")})
 public class Userdata implements Serializable {
@@ -64,8 +66,8 @@ public class Userdata implements Serializable {
     @Column(name = "email")
     private String email;
     @Size(max = 256)
-    @Column(name = "devicetoken")
-    private String devicetoken;
+    @Column(name = "gcmid")
+    private String gcmid;
     @Basic(optional = false)
     @NotNull
     @Column(name = "apptype")
@@ -79,6 +81,9 @@ public class Userdata implements Serializable {
     @Size(max = 512)
     @Column(name = "authtoken")
     private String authtoken;
+    @JoinColumn(name = "id", referencedColumnName = "userdataid", insertable = false, updatable = false)
+    @OneToOne(optional = false)
+    private Locationdata locationdata;
 
     public Userdata() {
     }
@@ -136,12 +141,12 @@ public class Userdata implements Serializable {
         this.email = email;
     }
 
-    public String getDevicetoken() {
-        return devicetoken;
+    public String getGcmid() {
+        return gcmid;
     }
 
-    public void setDevicetoken(String devicetoken) {
-        this.devicetoken = devicetoken;
+    public void setGcmid(String gcmid) {
+        this.gcmid = gcmid;
     }
 
     public short getApptype() {
@@ -166,6 +171,14 @@ public class Userdata implements Serializable {
 
     public void setAuthtoken(String authtoken) {
         this.authtoken = authtoken;
+    }
+
+    public Locationdata getLocationdata() {
+        return locationdata;
+    }
+
+    public void setLocationdata(Locationdata locationdata) {
+        this.locationdata = locationdata;
     }
 
     @Override
