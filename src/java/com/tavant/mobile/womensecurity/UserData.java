@@ -16,8 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
 import com.tavant.mobile.womensecurity.entity.Userdata;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import net.sf.json.JSONException;
 
 /**
  *
@@ -81,29 +84,49 @@ public class UserData extends HttpServlet {
                   outputString      +=  "\n<SS>FALSE</SS>";
                   outputString      +=  "\n<MSG>mandatory field cannot be empty</MSG></ROOT>";
            } 
-           else if(!isValidEmailAddress(email)){
-                  outputString      +=  "\n<SS>FALSE</SS>";
-                  outputString      +=  "\n<MSG>Invalid email address!</MSG></ROOT>";
-           }else if(!invalidPhoneNumber(phone)){
-                  outputString      +=  "\n<SS>FALSE</SS>";
-                  outputString      +=  "\n<MSG>Invalid phone number</MSG></ROOT>";
-           }else{    
-           user=new Userdata();
-           user.setUserid(userid);
-           user.setIdtype(idtype);
-           user.setPhone(phone);
-           user.setEmail(email);
-           user.setGcmid(gcmid);
-           user.setApptype(apptype);
-           user.setOsname(osname);
-           user.setAuthtoken(authtoken);
-           userdataFacade.create(user);
-           outputString    +=  "<SS>TRUE</SS><MSG>Registration successful.</MSG></ROOT>";
-           }
+           else try {
+               if(!isValidEmailAddress(email)){
+                 outputString      +=  "\n<SS>FALSE</SS>";
+                 outputString      +=  "\n<MSG>Invalid email address!</MSG></ROOT>";
+          }else{    
+          user=new Userdata();
+          user.setUserid(userid);
+          user.setIdtype(idtype);
+          user.setPhone(phone);
+          user.setEmail(email);
+          user.setGcmid(gcmid);
+          user.setApptype(apptype);
+          user.setOsname(osname);
+          user.setAuthtoken(authtoken);
+          userdataFacade.create(user);
+          outputString    +=  "<SS>TRUE</SS><MSG>Registration successful.</MSG></ROOT>";
+          }} catch (AddressException ex) {
+               Logger.getLogger(UserData.class.getName()).log(Level.SEVERE, null, ex);
+           } 
            }else{
-              // get existing Userdata and update
+              if(!object.containsKey("userid"))
+                  throw new JSONException();
+              userid= object.getString("userid"); 
+              Userdata userData= userdataFacade.findByUserId(userid);
+              if(object.containsKey("phone"))
+                  userData.setPhone(object.getString("phone"));
+              else if(object.containsKey("email"))
+                   userData.setEmail(object.getString("email"));
+              else if(object.containsKey("gcmid"))
+                   userData.setGcmid(object.getString("gcmid"));
+              else if(object.containsKey("authtoken"))
+                   userData.setAuthtoken(object.getString("authtoken"));
+              userdataFacade.edit(userData);
+               outputString    +=  "<SS>TRUE</SS><MSG>User data updation successfull</MSG></ROOT>";
            }  
-        }catch(Exception e){
+        }catch(JSONException e){
+         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);   
+         outputString      +=  "\n<SS>FALSE</SS>";
+         outputString      +=  "\n<MSG>invalidContent</MSG></ROOT>";  
+         e.printStackTrace();
+        }catch(Exception e){  
+         outputString      +=  "\n<SS>FALSE</SS>";
+         outputString      +=  "\n<MSG>unknownerror</MSG></ROOT>";  
          e.printStackTrace();
         } finally{
              out.print(outputString);
@@ -165,9 +188,7 @@ public class UserData extends HttpServlet {
 
   }   
 
-    private boolean invalidPhoneNumber(String phone) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+   
     
     
     

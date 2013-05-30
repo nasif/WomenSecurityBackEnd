@@ -8,6 +8,7 @@ import com.tavant.mobile.womensecurity.entity.Userdata;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -25,6 +26,17 @@ public class UserdataFacade extends AbstractFacade<Userdata> implements Userdata
 
     public UserdataFacade() {
         super(Userdata.class);
+    }
+
+    @Override
+    public Userdata findByUserId(String userId) {
+         try{
+        Query queryByName = em.createNamedQuery("Userdata.findByUserid");
+        queryByName.setParameter("userid", userId);
+        return (Userdata) queryByName.getResultList().get(0);
+         }catch(Exception e){
+             return null;
+         }    
     }
     
 }

@@ -29,4 +29,6 @@ public interface UserdataFacadeLocal {
 
     int count();
     
+    Userdata findByUserId(String userId);
+    
 }
