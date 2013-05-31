@@ -29,4 +29,6 @@ public interface LocationdataFacadeLocal {
 
     int count();
     
+    Locationdata findById(int id);
+    
 }

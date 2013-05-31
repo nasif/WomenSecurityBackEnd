@@ -8,6 +8,7 @@ import com.tavant.mobile.womensecurity.entity.Locationdata;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -25,6 +26,20 @@ public class LocationdataFacade extends AbstractFacade<Locationdata> implements 
 
     public LocationdataFacade() {
         super(Locationdata.class);
+    }
+
+    @Override
+    public Locationdata findById(int id) {
+        
+       try{
+        Query queryByName = em.createNamedQuery("Locationdata.findByUserdataid");
+        queryByName.setParameter("userdataid", id);
+        return (Locationdata) queryByName.getResultList().get(0);
+         }catch(Exception e){
+             return null;
+         }      
+        
+        
     }
     
 }
