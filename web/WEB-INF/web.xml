@@ -4,9 +4,25 @@
         <servlet-name>UserData</servlet-name>
         <servlet-class>com.tavant.mobile.womensecurity.UserData</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>LocationData</servlet-name>
+        <servlet-class>com.tavant.mobile.womensecurity.LocationData</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>alert</servlet-name>
+        <servlet-class>com.tavant.mobile.womensecurity.UserAlert</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>UserData</servlet-name>
         <url-pattern>/user</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LocationData</servlet-name>
+        <url-pattern>/updatelocation</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>alert</servlet-name>
+        <url-pattern>/UserAlert</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

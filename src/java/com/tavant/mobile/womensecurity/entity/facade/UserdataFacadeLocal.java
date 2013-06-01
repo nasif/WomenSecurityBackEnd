@@ -30,5 +30,7 @@ public interface UserdataFacadeLocal {
     int count();
     
     Userdata findByUserId(String userId);
+
+    public Userdata findByPhoneNumber(String string);
     
 }

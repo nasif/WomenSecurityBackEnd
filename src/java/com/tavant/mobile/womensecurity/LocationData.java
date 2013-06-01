@@ -11,13 +11,24 @@ import com.tavant.mobile.womensecurity.entity.facade.UserdataFacadeLocal;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.SyncBasicHttpParams;
 
 /**
  *
@@ -30,8 +41,11 @@ public class LocationData extends HttpServlet {
     @EJB
     private UserdataFacadeLocal userdataFacade;
     
+    private static final String REVRESE_LOCATION_API
+            ="http://maps.googleapis.com/maps/api/geocode/json?latlng=%,%&sensor=true_or_false";
     
-
+    String currentlocation=null;
+    
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -43,9 +57,6 @@ public class LocationData extends HttpServlet {
      * @throws IOException if an I/O error occurs
      * 
      */
-    
-    
-    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -59,6 +70,7 @@ public class LocationData extends HttpServlet {
         String userid=null;
         String latitude=null;
         String longitude=null;
+       
         try {
             reader=request.getReader();
            while((line=reader.readLine())!=null){
@@ -73,17 +85,28 @@ public class LocationData extends HttpServlet {
              outputString      +=  "\n<SS>FALSE</SS>";
              outputString      +=  "\n<MSG>Inavlid message</MSG></ROOT>";
            }else{
+              currentlocation=getgeographiceLocation(latitude,longitude); 
               Userdata userData= userdataFacade.findByUserId(userid);
               Integer id=userData.getId();
               Locationdata location=locationdataFacade.findById(id);
               if(location!=null){
-                //update
+                 location.setLatitude(latitude);
+                 location.setLatitude(longitude);
+                 location.setLocation(currentlocation);
+                 locationdataFacade.edit(location);
               }else{
-                 // insert
+                  Locationdata newloc=new Locationdata();
+                  newloc.setLatitude(latitude);
+                  newloc.setLongitude(longitude);
+                  newloc.setLocation(currentlocation);
+                  newloc.setUserdata(userData);
+                  locationdataFacade.create(location);
               }
+               String phonenumber=getNearestCopnumber();
+               outputString      +=  "\n<SS>TRUE</SS>";
+               outputString      +=  "\n<MSG><PHONENO>"+phonenumber+"</PHONENO></MSG></ROOT>"; 
               //fetch latest police numner here
            }
-           
         }catch(JSONException e){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);   
             outputString      +=  "\n<SS>FALSE</SS>";
@@ -125,4 +148,47 @@ public class LocationData extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private String getgeographiceLocation(String latitude, String longitude) {
+        try {
+            String url=String.format(REVRESE_LOCATION_API,latitude,longitude); 
+            HttpGet request = new HttpGet(url);
+            HttpParams params = new SyncBasicHttpParams();
+            HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(params, "UTF-8");
+            HttpProtocolParams.setUserAgent(params, "HttpComponents/1.1");
+            DefaultHttpClient client=new DefaultHttpClient(params);
+            HttpResponse res=client.execute(request);
+            JSONObject object=JSONObject.fromObject(EntityUtils.toString(res.getEntity()));
+            JSONArray jsonarray=  object.getJSONArray("results");
+            JSONObject firstobject=(JSONObject) jsonarray.get(0);
+            return firstobject.get("formatted_address").toString();
+        } catch (Exception ex) {
+            Logger.getLogger(LocationData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } 
+    }
+
+    private String getNearestCopnumber() {  
+        Locationdata data=locationdataFacade.findByLocation(currentlocation);
+        if(data!=null)
+         return data.getUserdata().getPhone();
+        else{
+         return getApproximateCopNumber(0);
+        }        
+    }
+    
+    private String getApproximateCopNumber(int index){
+      String array[]=currentlocation.split(",");
+      String temp="";
+      for(int i=index+1;i<array.length;i++)
+          temp=array[i]+",";
+      Locationdata data=locationdataFacade.findByLocation(temp);
+       if(data!=null)
+         return data.getUserdata().getPhone();
+        else{
+         return getApproximateCopNumber(1);
+        }   
+    }
+    
 }

@@ -31,4 +31,8 @@ public interface LocationdataFacadeLocal {
     
     Locationdata findById(int id);
     
+    Locationdata findByLocationLike(String userId);
+    
+    Locationdata findByLocation(String location);
+    
 }

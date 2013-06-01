@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Tavant
+ * @author nasif
  */
 @Entity
 @Table(name = "locationdata")
@@ -32,7 +32,11 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Locationdata.findById", query = "SELECT l FROM Locationdata l WHERE l.id = :id"),
     @NamedQuery(name = "Locationdata.findByUserdataid", query = "SELECT l FROM Locationdata l WHERE l.userdataid = :userdataid"),
     @NamedQuery(name = "Locationdata.findByLatitude", query = "SELECT l FROM Locationdata l WHERE l.latitude = :latitude"),
-    @NamedQuery(name = "Locationdata.findByLongitude", query = "SELECT l FROM Locationdata l WHERE l.longitude = :longitude")})
+    @NamedQuery(name = "Locationdata.findByLongitude", query = "SELECT l FROM Locationdata l WHERE l.longitude = :longitude"),
+    @NamedQuery(name = "Locationdata.findByLocation", query = "SELECT l FROM Locationdata l WHERE l.location = :location"),
+    @NamedQuery(name = "Locationdata.findByLocationJoin", query = "SELECT l FROM Locationdata l INNER JOIN  Userdata U ON l.userdataid=U.id WHERE l.location = :location"),
+    @NamedQuery(name = "Locationdata.findByLocationJoinLike", query = "SELECT l FROM Locationdata l INNER JOIN  Userdata U ON l.userdataid=U.id WHERE l.location LIKE :location"), 
+})
 public class Locationdata implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -54,6 +58,9 @@ public class Locationdata implements Serializable {
     @Size(min = 1, max = 60)
     @Column(name = "longitude")
     private String longitude;
+    @Size(max = 250)
+    @Column(name = "location")
+    private String location;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "locationdata")
     private Userdata userdata;
 
@@ -101,6 +108,14 @@ public class Locationdata implements Serializable {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public Userdata getUserdata() {

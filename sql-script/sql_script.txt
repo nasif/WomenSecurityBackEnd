@@ -5,6 +5,7 @@ CREATE  TABLE IF NOT EXISTS `womensecurity`.`locationdata` (
   `userdataid` INT NOT NULL ,
   `latitude` VARCHAR(60) NOT NULL ,
   `longitude` VARCHAR(60) NOT NULL ,
+  `location` VARCHAR(250) NULL ,
   PRIMARY KEY (`id`),KEY (`userdataid`))
 ENGINE = InnoDB;
 

@@ -29,8 +29,7 @@ public class LocationdataFacade extends AbstractFacade<Locationdata> implements 
     }
 
     @Override
-    public Locationdata findById(int id) {
-        
+    public Locationdata findById(int id) { 
        try{
         Query queryByName = em.createNamedQuery("Locationdata.findByUserdataid");
         queryByName.setParameter("userdataid", id);
@@ -38,8 +37,27 @@ public class LocationdataFacade extends AbstractFacade<Locationdata> implements 
          }catch(Exception e){
              return null;
          }      
-        
-        
     }
     
+    @Override
+    public Locationdata findByLocation(String location) { 
+       try{
+        Query queryByName = em.createNamedQuery("Locationdata.findByLocationJoin");
+        queryByName.setParameter("location", location);
+        return (Locationdata) queryByName.getResultList().get(0);
+         }catch(Exception e){
+             return null;
+         }      
+    }
+
+    @Override
+    public Locationdata findByLocationLike(String userId) {
+       try{
+        Query queryByName = em.createNamedQuery("Locationdata.findByLocationJoinLike");
+        queryByName.setParameter("location", "%"+userId);
+        return (Locationdata) queryByName.getResultList().get(0);
+         }catch(Exception e){
+             return null;
+         }      
+    }    
 }

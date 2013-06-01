@@ -38,5 +38,10 @@ public class UserdataFacade extends AbstractFacade<Userdata> implements Userdata
              return null;
          }    
     }
+
+    @Override
+    public Userdata findByPhoneNumber(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }
