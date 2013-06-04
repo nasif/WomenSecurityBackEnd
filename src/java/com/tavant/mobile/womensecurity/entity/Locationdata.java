@@ -33,10 +33,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Locationdata.findByLatitude", query = "SELECT l FROM Locationdata l WHERE l.latitude = :latitude"),
     @NamedQuery(name = "Locationdata.findByLongitude", query = "SELECT l FROM Locationdata l WHERE l.longitude = :longitude"),
     @NamedQuery(name = "Locationdata.findByLocation", query = "SELECT l FROM Locationdata l WHERE l.location = :location"),
-    @NamedQuery(name = "Locationdata.findByUserdataid", query = "SELECT l FROM Locationdata l WHERE l.userdataid = :uid"),
-
-
-
+    @NamedQuery(name = "Locationdata.findByUserdataid", query = "SELECT l FROM Locationdata l WHERE l.userdataid = :userdataid")
 })
 public class Locationdata implements Serializable {
     private static final long serialVersionUID = 1L;

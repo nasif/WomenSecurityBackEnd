@@ -87,11 +87,12 @@ public class LocationData extends HttpServlet {
            }else{
               currentlocation=getgeographiceLocation(latitude,longitude); 
               Userdata userData= userdataFacade.findByUserId(userid);
-              Locationdata location=locationdataFacade.findByuserId(userid);
-             
+              Locationdata location=locationdataFacade.findByuserId(userData);
+              
+              
               if(location!=null){
                  location.setLatitude(latitude);
-                 location.setLatitude(longitude);
+                 location.setLongitude(longitude);
                  location.setLocation(currentlocation);
                  locationdataFacade.edit(location);
               }else{
@@ -100,9 +101,10 @@ public class LocationData extends HttpServlet {
                   newloc.setLongitude(longitude);
                   newloc.setLocation(currentlocation);
                   newloc.setUserdataid(userData);
-                  locationdataFacade.create(location);
+                  locationdataFacade.create(newloc);
               }
-               String phonenumber=getNearestCopnumber();
+               String phonenumber="9663960311";
+                       //getNearestCopnumber();
                outputString      +=  "\n<SS>TRUE</SS>";
                outputString      +=  "\n<MSG><PHONENO>"+phonenumber+"</PHONENO></MSG></ROOT>"; 
               //fetch latest police numner here

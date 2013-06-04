@@ -5,6 +5,7 @@
 package com.tavant.mobile.womensecurity.entity.facade;
 
 import com.tavant.mobile.womensecurity.entity.Locationdata;
+import com.tavant.mobile.womensecurity.entity.Userdata;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -29,7 +30,7 @@ public interface LocationdataFacadeLocal {
 
     int count();
     
-    Locationdata findByuserId(String uid);
+    Locationdata findByuserId(Userdata uid);
     
     Locationdata findByLocationLike(String userId);
     
