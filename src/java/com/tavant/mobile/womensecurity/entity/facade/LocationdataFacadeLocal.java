@@ -29,7 +29,7 @@ public interface LocationdataFacadeLocal {
 
     int count();
     
-    Locationdata findById(int id);
+    Locationdata findByuserId(String uid);
     
     Locationdata findByLocationLike(String userId);
     

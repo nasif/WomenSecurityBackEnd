@@ -29,10 +29,10 @@ public class LocationdataFacade extends AbstractFacade<Locationdata> implements 
     }
 
     @Override
-    public Locationdata findById(int id) { 
+    public Locationdata findByuserId(String id) { 
        try{
         Query queryByName = em.createNamedQuery("Locationdata.findByUserdataid");
-        queryByName.setParameter("userdataid", id);
+        queryByName.setParameter("uid", id);
         return (Locationdata) queryByName.getResultList().get(0);
          }catch(Exception e){
              return null;

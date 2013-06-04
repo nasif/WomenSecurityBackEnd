@@ -5,25 +5,27 @@
 package com.tavant.mobile.womensecurity.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author nasif
+ * @author Tavant
  */
 @Entity
 @Table(name = "userdata")
@@ -81,9 +83,8 @@ public class Userdata implements Serializable {
     @Size(max = 512)
     @Column(name = "authtoken")
     private String authtoken;
-    @JoinColumn(name = "id", referencedColumnName = "userdataid", insertable = false, updatable = false)
-    @OneToOne(optional = false)
-    private Locationdata locationdata;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userdataid")
+    private Collection<Locationdata> locationdataCollection;
 
     public Userdata() {
     }
@@ -173,12 +174,13 @@ public class Userdata implements Serializable {
         this.authtoken = authtoken;
     }
 
-    public Locationdata getLocationdata() {
-        return locationdata;
+    @XmlTransient
+    public Collection<Locationdata> getLocationdataCollection() {
+        return locationdataCollection;
     }
 
-    public void setLocationdata(Locationdata locationdata) {
-        this.locationdata = locationdata;
+    public void setLocationdataCollection(Collection<Locationdata> locationdataCollection) {
+        this.locationdataCollection = locationdataCollection;
     }
 
     @Override

@@ -5,6 +5,7 @@
  */
 package com.tavant.mobile.womensecurity;
 
+import com.tavant.mobile.womensecurity.entity.Locationdata;
 import com.tavant.mobile.womensecurity.entity.facade.UserdataFacadeLocal;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
 import com.tavant.mobile.womensecurity.entity.Userdata;
+import com.tavant.mobile.womensecurity.entity.facade.LocationdataFacadeLocal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.internet.AddressException;
@@ -27,11 +29,16 @@ import net.sf.json.JSONException;
  * @author nasif
  */
 public class UserData extends HttpServlet {
+//    @EJB
+//    private LocationdataFacadeLocal locationdataFacade;
     
     @EJB
     private UserdataFacadeLocal userdataFacade;
+    
+   
+    
     private Userdata user=null;
-
+   // private Locationdata location=null;
     
 
     /**
@@ -45,7 +52,7 @@ public class UserData extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response,boolean iscreate)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/xml;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -70,7 +77,6 @@ public class UserData extends HttpServlet {
             buffer.append(line);
            }
            object=JSONObject.fromObject(buffer.toString());
-           if(iscreate){  
            userid=object.getString("userid");    
            idtype=object.getString("idtype");
            phone=object.getString("phone");
@@ -82,41 +88,41 @@ public class UserData extends HttpServlet {
            if(userid==null||phone==null||apptype==-1||osname==null){
                   outputString      +=  "\n<SS>FALSE</SS>";
                   outputString      +=  "\n<MSG>mandatory field cannot be empty</MSG></ROOT>";
-           } 
-           else try {
-               if(!isValidEmailAddress(email)){
-                 outputString      +=  "\n<SS>FALSE</SS>";
-                 outputString      +=  "\n<MSG>Invalid email address!</MSG></ROOT>";
-          }else{    
-          user=new Userdata();
-          user.setUserid(userid);
-          user.setIdtype(idtype);
-          user.setPhone(phone);
-          user.setEmail(email);
-          user.setGcmid(gcmid);
-          user.setApptype(apptype);
-          user.setOsname(osname);
-          user.setAuthtoken(authtoken);
-          userdataFacade.create(user);
-          outputString    +=  "<SS>TRUE</SS><MSG>Registration successful.</MSG></ROOT>";
-          }} catch (AddressException ex) {
-               Logger.getLogger(UserData.class.getName()).log(Level.SEVERE, null, ex);
-           } 
+           }else if(!isValidEmailAddress(email)){
+              outputString      +=  "\n<SS>FALSE</SS>";
+              outputString      +=  "\n<MSG>Invalid email address!</MSG></ROOT>";
+           
            }else{
-              if(!object.containsKey("userid"))
-                  throw new JSONException();
-              userid= object.getString("userid"); 
-              Userdata userData= userdataFacade.findByUserId(userid);
-              if(object.containsKey("phone"))
-                  userData.setPhone(object.getString("phone"));
-              else if(object.containsKey("email"))
-                   userData.setEmail(object.getString("email"));
-              else if(object.containsKey("gcmid"))
-                   userData.setGcmid(object.getString("gcmid"));
-              else if(object.containsKey("authtoken"))
-                   userData.setAuthtoken(object.getString("authtoken"));
-              userdataFacade.edit(userData);
-               outputString    +=  "<SS>TRUE</SS><MSG>User data updation successfull</MSG></ROOT>";
+              
+             user=userdataFacade.findByUserId(userid);
+             if(user==null){
+               user=new Userdata();
+               user.setUserid(userid);
+               user.setIdtype(idtype);
+               user.setPhone(phone);
+               user.setEmail(email);
+               user.setGcmid(gcmid);
+               user.setApptype(apptype);
+               user.setOsname(osname);
+               user.setAuthtoken(authtoken);
+               userdataFacade.create(user);
+               outputString    +=  "<SS>TRUE</SS><MSG>Registration successful.</MSG></ROOT>";
+             }else {
+               if(idtype.length()>0)  
+               user.setIdtype(idtype);
+               if(phone.length()>0)
+               user.setPhone(phone);
+               if(email.length()>0)
+               user.setEmail(email);
+               if(gcmid.length()>0)
+               user.setGcmid(gcmid);
+               if(osname.length()>0)
+               user.setOsname(osname);
+               if(authtoken.length()>0)
+               user.setAuthtoken(authtoken);
+               userdataFacade.edit(user);
+               outputString    +=  "<SS>TRUE</SS><MSG>User Updated Successfully</MSG></ROOT>";
+             }
            }  
         }catch(JSONException e){
          response.setStatus(HttpServletResponse.SC_BAD_REQUEST);   
@@ -141,11 +147,11 @@ public class UserData extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response,false);
-    }
+//    @Override
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        processRequest(request, response,false);
+//    }
 
     /**
      * Returns a short description of the servlet.
@@ -159,7 +165,7 @@ public class UserData extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-       processRequest(req, resp,true);
+       processRequest(req, resp);
     }
     
     private  boolean isValidEmailAddress(String aEmailAddress) throws AddressException, AddressException, AddressException{

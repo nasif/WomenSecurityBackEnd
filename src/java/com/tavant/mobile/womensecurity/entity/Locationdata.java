@@ -6,15 +6,15 @@ package com.tavant.mobile.womensecurity.entity;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author nasif
+ * @author Tavant
  */
 @Entity
 @Table(name = "locationdata")
@@ -30,12 +30,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Locationdata.findAll", query = "SELECT l FROM Locationdata l"),
     @NamedQuery(name = "Locationdata.findById", query = "SELECT l FROM Locationdata l WHERE l.id = :id"),
-    @NamedQuery(name = "Locationdata.findByUserdataid", query = "SELECT l FROM Locationdata l WHERE l.userdataid = :userdataid"),
     @NamedQuery(name = "Locationdata.findByLatitude", query = "SELECT l FROM Locationdata l WHERE l.latitude = :latitude"),
     @NamedQuery(name = "Locationdata.findByLongitude", query = "SELECT l FROM Locationdata l WHERE l.longitude = :longitude"),
     @NamedQuery(name = "Locationdata.findByLocation", query = "SELECT l FROM Locationdata l WHERE l.location = :location"),
-    @NamedQuery(name = "Locationdata.findByLocationJoin", query = "SELECT l FROM Locationdata l INNER JOIN  Userdata U ON l.userdataid=U.id WHERE l.location = :location"),
-    @NamedQuery(name = "Locationdata.findByLocationJoinLike", query = "SELECT l FROM Locationdata l INNER JOIN  Userdata U ON l.userdataid=U.id WHERE l.location LIKE :location"), 
+    @NamedQuery(name = "Locationdata.findByUserdataid", query = "SELECT l FROM Locationdata l WHERE l.userdataid = :uid"),
+
+
+
 })
 public class Locationdata implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -44,10 +45,6 @@ public class Locationdata implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "userdataid")
-    private int userdataid;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 60)
@@ -61,8 +58,9 @@ public class Locationdata implements Serializable {
     @Size(max = 250)
     @Column(name = "location")
     private String location;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "locationdata")
-    private Userdata userdata;
+    @JoinColumn(name = "userdataid", referencedColumnName = "userid")
+    @ManyToOne(optional = false)
+    private Userdata userdataid;
 
     public Locationdata() {
     }
@@ -71,9 +69,8 @@ public class Locationdata implements Serializable {
         this.id = id;
     }
 
-    public Locationdata(Integer id, int userdataid, String latitude, String longitude) {
+    public Locationdata(Integer id, String latitude, String longitude) {
         this.id = id;
-        this.userdataid = userdataid;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -84,14 +81,6 @@ public class Locationdata implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public int getUserdataid() {
-        return userdataid;
-    }
-
-    public void setUserdataid(int userdataid) {
-        this.userdataid = userdataid;
     }
 
     public String getLatitude() {
@@ -118,12 +107,12 @@ public class Locationdata implements Serializable {
         this.location = location;
     }
 
-    public Userdata getUserdata() {
-        return userdata;
+    public Userdata getUserdataid() {
+        return userdataid;
     }
 
-    public void setUserdata(Userdata userdata) {
-        this.userdata = userdata;
+    public void setUserdataid(Userdata userdataid) {
+        this.userdataid = userdataid;
     }
 
     @Override

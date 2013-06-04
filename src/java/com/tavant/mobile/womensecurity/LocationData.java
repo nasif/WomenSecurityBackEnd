@@ -42,7 +42,7 @@ public class LocationData extends HttpServlet {
     private UserdataFacadeLocal userdataFacade;
     
     private static final String REVRESE_LOCATION_API
-            ="http://maps.googleapis.com/maps/api/geocode/json?latlng=%,%&sensor=true_or_false";
+            ="http://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&sensor=true";
     
     String currentlocation=null;
     
@@ -79,7 +79,7 @@ public class LocationData extends HttpServlet {
            object=JSONObject.fromObject(buffer.toString());
            userid=object.getString("userid");
            latitude=object.getString("latitude");
-           longitude=object.getString("latitude");
+           longitude=object.getString("longitude");
            if(userid==null||latitude==null||longitude==null){
              response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
              outputString      +=  "\n<SS>FALSE</SS>";
@@ -87,8 +87,8 @@ public class LocationData extends HttpServlet {
            }else{
               currentlocation=getgeographiceLocation(latitude,longitude); 
               Userdata userData= userdataFacade.findByUserId(userid);
-              Integer id=userData.getId();
-              Locationdata location=locationdataFacade.findById(id);
+              Locationdata location=locationdataFacade.findByuserId(userid);
+             
               if(location!=null){
                  location.setLatitude(latitude);
                  location.setLatitude(longitude);
@@ -99,7 +99,7 @@ public class LocationData extends HttpServlet {
                   newloc.setLatitude(latitude);
                   newloc.setLongitude(longitude);
                   newloc.setLocation(currentlocation);
-                  newloc.setUserdata(userData);
+                  newloc.setUserdataid(userData);
                   locationdataFacade.create(location);
               }
                String phonenumber=getNearestCopnumber();
@@ -172,7 +172,7 @@ public class LocationData extends HttpServlet {
     private String getNearestCopnumber() {  
         Locationdata data=locationdataFacade.findByLocation(currentlocation);
         if(data!=null)
-         return data.getUserdata().getPhone();
+         return data.getUserdataid().getPhone();
         else{
          return getApproximateCopNumber(0);
         }        
@@ -185,7 +185,7 @@ public class LocationData extends HttpServlet {
           temp=array[i]+",";
       Locationdata data=locationdataFacade.findByLocation(temp);
        if(data!=null)
-         return data.getUserdata().getPhone();
+         return data.getUserdataid().getPhone();
         else{
          return getApproximateCopNumber(1);
         }   
