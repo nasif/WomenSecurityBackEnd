@@ -5,6 +5,7 @@
 package com.tavant.mobile.womensecurity.entity.facade;
 
 import com.tavant.mobile.womensecurity.entity.Userdata;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,9 +40,9 @@ public class UserdataFacade extends AbstractFacade<Userdata> implements Userdata
          }    
     }
 
-    @Override
-    public Userdata findByPhoneNumber(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
+
+    
+
     
 }

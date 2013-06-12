@@ -36,4 +36,8 @@ public interface LocationdataFacadeLocal {
     
     Locationdata findByLocation(String location);
     
+    List<Locationdata> findByUserJoin(String location, short appType);
+    
+    List<Locationdata> findByUserJoinLike(String location, short appType);
+    
 }

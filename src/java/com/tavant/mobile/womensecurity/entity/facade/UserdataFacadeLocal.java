@@ -31,6 +31,6 @@ public interface UserdataFacadeLocal {
     
     Userdata findByUserId(String userId);
 
-    public Userdata findByPhoneNumber(String string);
+   
     
 }

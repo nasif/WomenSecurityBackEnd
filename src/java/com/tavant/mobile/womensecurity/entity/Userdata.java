@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlTransient;
  *
  * @author Tavant
  */
+
+//
 @Entity
 @Table(name = "userdata")
 @XmlRootElement
@@ -38,7 +40,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Userdata.findByEmail", query = "SELECT u FROM Userdata u WHERE u.email = :email"),
     @NamedQuery(name = "Userdata.findByGcmid", query = "SELECT u FROM Userdata u WHERE u.gcmid = :gcmid"),
     @NamedQuery(name = "Userdata.findByApptype", query = "SELECT u FROM Userdata u WHERE u.apptype = :apptype"),
-    @NamedQuery(name = "Userdata.findByAuthtoken", query = "SELECT u FROM Userdata u WHERE u.authtoken = :authtoken")})
+    @NamedQuery(name = "Userdata.findByAuthtoken", query = "SELECT u FROM Userdata u WHERE u.authtoken = :authtoken")
+    //@NamedQuery(name = "Userdata.findByuserjoin", query = "SELECT u FROM  Userdata u JOIN Locationdata M on u.userid = M.userdataid where  I.apptype = :apptype AND M.location = :location"), 
+
+})
 public class Userdata implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

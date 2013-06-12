@@ -6,6 +6,7 @@ package com.tavant.mobile.womensecurity.entity.facade;
 
 import com.tavant.mobile.womensecurity.entity.Locationdata;
 import com.tavant.mobile.womensecurity.entity.Userdata;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -62,5 +63,35 @@ public class LocationdataFacade extends AbstractFacade<Locationdata> implements 
          }catch(Exception e){
              return null;
          }      
-    }    
+    }
+    
+    
+    @Override
+    public List<Locationdata> findByUserJoin(String location, short appType) {
+         try{
+        Query queryByName = em.createNamedQuery("Locationdata.findByUserdataidjoin");
+        queryByName.setParameter("apptype", appType);
+        queryByName.setParameter("location", location);
+        return queryByName.getResultList();
+         }catch(Exception e){
+             e.printStackTrace();
+             return null;
+         }    
+        
+    }
+    
+    
+    @Override
+    public List<Locationdata> findByUserJoinLike(String like, short appType) {
+         try{
+        Query queryByName = em.createNamedQuery("Locationdata.findByUserdataidjoinlike");
+        queryByName.setParameter("apptype", "%"+appType);
+        queryByName.setParameter("location", like);
+        return queryByName.getResultList();
+         }catch(Exception e){
+             e.printStackTrace();
+             return null;
+         }    
+        
+    }
 }

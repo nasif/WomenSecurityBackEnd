@@ -11,6 +11,7 @@ import com.tavant.mobile.womensecurity.entity.facade.UserdataFacadeLocal;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -66,10 +67,11 @@ public class LocationData extends HttpServlet {
         String line=null;
         JSONObject object=null;
         String outputString     =   "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ROOT>";
-        outputString            +=  "<METHOD>user</METHOD>\n";
+        outputString            +=  "<METHOD>updatelocation</METHOD>\n";
         String userid=null;
         String latitude=null;
         String longitude=null;
+        short apptype=-1;
        
         try {
             reader=request.getReader();
@@ -79,13 +81,16 @@ public class LocationData extends HttpServlet {
            object=JSONObject.fromObject(buffer.toString());
            userid=object.getString("userid");
            latitude=object.getString("latitude");
+           System.out.println("get the latest latitude"+latitude);
            longitude=object.getString("longitude");
+           apptype=Short.parseShort(object.getString("apptype")); 
            if(userid==null||latitude==null||longitude==null){
              response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
              outputString      +=  "\n<SS>FALSE</SS>";
              outputString      +=  "\n<MSG>Inavlid message</MSG></ROOT>";
            }else{
               currentlocation=getgeographiceLocation(latitude,longitude); 
+              System.out.println("current user location is"+currentlocation);
               Userdata userData= userdataFacade.findByUserId(userid);
               Locationdata location=locationdataFacade.findByuserId(userData);
               
@@ -103,11 +108,13 @@ public class LocationData extends HttpServlet {
                   newloc.setUserdataid(userData);
                   locationdataFacade.create(newloc);
               }
-               String phonenumber="9663960311";
-                       //getNearestCopnumber();
-               outputString      +=  "\n<SS>TRUE</SS>";
-               outputString      +=  "\n<MSG><PHONENO>"+phonenumber+"</PHONENO></MSG></ROOT>"; 
-              //fetch latest police numner here
+              String phonenumber="";
+              if(apptype==0){
+                  currentlocation="Koramangala, Bangalore, Karnataka 560095, India";
+                  phonenumber=getNearestCopnumber(currentlocation);  //Nearest cop have to give only for apptype=0,
+              }
+              outputString      +=  "\n<SS>TRUE</SS>";
+              outputString      +=  "\n<MSG>LocationupdatedSuccessfully</MSG><PHONENO>"+phonenumber+"</PHONENO></ROOT>"; 
            }
         }catch(JSONException e){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);   
@@ -171,26 +178,34 @@ public class LocationData extends HttpServlet {
         } 
     }
 
-    private String getNearestCopnumber() {  
-        Locationdata data=locationdataFacade.findByLocation(currentlocation);
-        if(data!=null)
-         return data.getUserdataid().getPhone();
+    private String getNearestCopnumber(String currentlocation) {  
+        //Userdata data=null;
+        //data.
+        System.out.println("calling nearest cop");
+        List<Locationdata> list=locationdataFacade.findByUserJoin(currentlocation, (short)1);
+        System.out.println("calling nearest cop"+list.toString());
+        if(list!=null&&list.size()>0){
+          return list.get(0).getUserdataid().getPhone();
+         }
         else{
          return getApproximateCopNumber(0);
         }        
     }
     
     private String getApproximateCopNumber(int index){
+        return "harcoded";
+        /*
       String array[]=currentlocation.split(",");
       String temp="";
       for(int i=index+1;i<array.length;i++)
-          temp=array[i]+",";
-      Locationdata data=locationdataFacade.findByLocation(temp);
-       if(data!=null)
-         return data.getUserdataid().getPhone();
+          temp=temp+array[i]+",";
+      List<Locationdata> list=locationdataFacade.findByUserJoinLike(temp,(short)1);
+       if(list!=null&&list.size()>0)
+         return list.get(0).getUserdataid().getPhone();
         else{
          return getApproximateCopNumber(1);
-        }   
+        } */
+        
     }
     
 }
