@@ -40,6 +40,17 @@ public class UserdataFacade extends AbstractFacade<Userdata> implements Userdata
          }    
     }
 
+    @Override
+    public Userdata findByUserPhoneNumber(String phoneNumber) {
+        try{
+        Query queryByName = em.createNamedQuery("Userdata.findByPhone");
+        queryByName.setParameter("phone", phoneNumber);
+        return (Userdata) queryByName.getResultList().get(0);
+         }catch(Exception e){
+             return null;
+         }    
+    }
+
     
 
     

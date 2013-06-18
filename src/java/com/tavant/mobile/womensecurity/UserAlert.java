@@ -21,16 +21,38 @@ import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import com.google.android.gcm.server.Sender;
+import com.tavant.mobile.womensecurity.entity.AlertMail;
+import com.tavant.mobile.womensecurity.entity.Locationdata;
+import com.tavant.mobile.womensecurity.entity.facade.LocationdataFacadeLocal;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import net.sf.json.JSONArray;
 
 /**
  *
  * @author nasif
  */
 public class UserAlert extends HttpServlet {
-
     
+    @EJB
+    private LocationdataFacadeLocal locationdataFacade;
+
+
      @EJB
     private UserdataFacadeLocal userdataFacade;
+     
+     
+    private AtomicInteger integer=null; 
+
+    @Override
+    public void init() throws ServletException {
+        super.init(); //To change body of generated methods, choose Tools | Templates.
+        integer=new AtomicInteger(1);
+    }
+     
+    
+     
+     
     private Userdata user=null;
      
     private static final String GCM_API_KEY="AIzaSyCqiQHsxuKG8zsW0Gv8JuCRmR8CATzZPhA";
@@ -53,43 +75,58 @@ public class UserAlert extends HttpServlet {
         StringBuffer buffer=new StringBuffer();
         BufferedReader reader=null;
         String line=null;
-      //  JSONObject object=null;
+        JSONObject object=null;
         ArrayList<String>list=null;
-        
+        String userId=null;
+        String userphone=null;
+        String useremail=null;
+        Userdata currentuser=null;
+        Locationdata lcation=null;
+        AlertMail mail=null;
         String outputString     =   "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ROOT>";
-        outputString            +=  "<METHOD>user</METHOD>\n";
+        outputString            +=  "<METHOD>UserAlert</METHOD>\n";
         try {
-//        reader=request.getReader();
-//           while((line=reader.readLine())!=null){
-//            buffer.append(line);
-//           }
-//        object=JSONObject.fromObject(buffer.toString()); 
-//        String array[]=(String[]) object.get("phonenumber");
-        Message message = new Message.Builder()
-                 .collapseKey("collapse_key")
-                 .timeToLive(3)
-                 .delayWhileIdle(true)
-                 .addData("msg", "value1")
-                 .addData("tel", "9663960311")
-                 .build();
-        //APA91bHraVDsnemZiNwiLhewQE9U1Q0eHE3dQgx3vkDfMYgLqKR5eRinfCNvDy_IBEWzWEpN2HsV2nZrg3WRHBug7G_9sWNLclrwOwK4logcpJgj8b6nSkcHnzJABRcwASYUpLnFuCPdE-8Wgt5JF85BQZTp2hLSSXde14I_HsGj8yqgXEHIqsw
-      
-         Sender sender=new Sender(GCM_API_KEY);
-         Result res=sender.sendNoRetry(message,"APA91bFRIiOrMSnjyErjwKBoYakQAI8ce5PzKFONmP22GAlD0j9triRIF4FhnRLTgPDzox5i6Zb08ZND-XOE5AZwOTnBOhNd9P4600BkqnD5bjXKyeiXUS6DwgtIy740arpM_-ISMpYC6WB8Bh_O11zA0joc134DrynMDhGX9g1WWsDAS135Gj0");
-         System.out.println(""+res);
-         list=new ArrayList<String>();
-//        for(int i=0;i<array.length;i++){
-//          Userdata user=  userdataFacade.findByPhoneNumber(array[0]);
-//          String gcmID=user.getGcmid();
-//          if(gcmID!=null)
-//              list.add(gcmID);
-//          if(list.size()>0){
-//             Sender sender=new Sender(GCM_API_KEY);
-//             sender.sendNoRetry(message, list);
-//          }    
-//        }
-        outputString      +=  "\n<SS>FALSE</SS>";
-        outputString      +=  "\n<MSG>Invalid email address!</MSG></ROOT>"; 
+        reader=request.getReader();
+           while((line=reader.readLine())!=null){
+            buffer.append(line);
+           }
+        object=JSONObject.fromObject(buffer.toString()); 
+        userId=object.getString("userid");
+        currentuser=userdataFacade.findByUserId(userId);
+        lcation=locationdataFacade.findByuserId(currentuser);
+        userphone=currentuser.getPhone();
+        useremail=currentuser.getEmail();
+        JSONArray array=(JSONArray) object.get("phonenumber");
+        
+
+        list=new ArrayList<String>();
+        for(int i=0;i<array.size();i++){
+          Userdata user=  userdataFacade.findByUserPhoneNumber(array.getString(i));
+          if(user!=null&&user.getGcmid()!=null){
+              list.add(user.getGcmid()); 
+              mail=new AlertMail(user.getEmail(),useremail);
+          }      
+        }
+        if(list.size()>0){
+             Message.Builder builder=new Message.Builder();
+             builder.collapseKey("collapse_key"+integer.incrementAndGet());
+             builder.timeToLive(259200);  // 3days msg will be in server
+             builder.delayWhileIdle(false);
+             builder.addData("msg", "I am in danger please help me");
+             builder.addData("tel", userphone);
+             builder.addData("lat", lcation.getLatitude());
+             builder.addData("long", lcation.getLongitude());
+             Message msg=builder.build();
+             Sender sender=new Sender(GCM_API_KEY);
+             MulticastResult mresult=sender.sendNoRetry(msg, list);
+             List<Result>results=mresult.getResults();
+             for(Result result:results){
+               System.out.println("message id"+result.getMessageId());
+             }
+             System.out.println("succes is"+mresult.getSuccess()+"Total is"+mresult.getTotal());
+          } 
+        outputString      +=  "\n<SS>TRUE</SS>";
+        outputString      +=  "\n<MSG>Done</MSG></ROOT>"; 
         }catch(JSONException e){
          response.setStatus(HttpServletResponse.SC_BAD_REQUEST);   
          outputString      +=  "\n<SS>FALSE</SS>";

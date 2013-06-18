@@ -85,8 +85,8 @@ public class LocationdataFacade extends AbstractFacade<Locationdata> implements 
     public List<Locationdata> findByUserJoinLike(String like, short appType) {
          try{
         Query queryByName = em.createNamedQuery("Locationdata.findByUserdataidjoinlike");
-        queryByName.setParameter("apptype", "%"+appType);
-        queryByName.setParameter("location", like);
+        queryByName.setParameter("apptype", appType);
+        queryByName.setParameter("location", "%"+like);
         return queryByName.getResultList();
          }catch(Exception e){
              e.printStackTrace();

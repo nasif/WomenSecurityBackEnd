@@ -193,18 +193,28 @@ public class LocationData extends HttpServlet {
     }
     
     private String getApproximateCopNumber(int index){
-        return "harcoded";
-        /*
+        //return "harcoded";    
       String array[]=currentlocation.split(",");
       String temp="";
+      StringBuffer pattern=null;
       for(int i=index+1;i<array.length;i++)
           temp=temp+array[i]+",";
-      List<Locationdata> list=locationdataFacade.findByUserJoinLike(temp,(short)1);
+      System.out.println("temp is"+temp);
+      if(temp.endsWith(",")){
+      char c = ' ';   
+       //new StringBuffer(temp).se
+       pattern=new StringBuffer(temp);
+       pattern.setCharAt(temp.lastIndexOf(","),c);
+      }
+      List<Locationdata> list=locationdataFacade.findByUserJoinLike(pattern.toString().trim(),(short)1);
        if(list!=null&&list.size()>0)
          return list.get(0).getUserdataid().getPhone();
         else{
-         return getApproximateCopNumber(1);
-        } */
+         index=index+1;  
+         if(index==2)
+             return "";
+         return getApproximateCopNumber(index++);
+        } 
         
     }
     
