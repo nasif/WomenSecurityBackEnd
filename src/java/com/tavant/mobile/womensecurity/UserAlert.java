@@ -27,6 +27,7 @@ import com.tavant.mobile.womensecurity.entity.facade.LocationdataFacadeLocal;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.sf.json.JSONArray;
+import javax.mail.internet.InternetAddress;
 
 /**
  *
@@ -80,9 +81,13 @@ public class UserAlert extends HttpServlet {
         String userId=null;
         String userphone=null;
         String useremail=null;
+        String userlocation=null;
         Userdata currentuser=null;
         Locationdata lcation=null;
         AlertMail mail=null;
+        InternetAddress address[]=null;
+        
+        
         String outputString     =   "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ROOT>";
         outputString            +=  "<METHOD>UserAlert</METHOD>\n";
         try {
@@ -97,15 +102,24 @@ public class UserAlert extends HttpServlet {
         userphone=currentuser.getPhone();
         useremail=currentuser.getEmail();
         JSONArray array=(JSONArray) object.get("phonenumber");
-        
+        address=new InternetAddress[array.size()];
 
         list=new ArrayList<String>();
         for(int i=0;i<array.size();i++){
           Userdata user=  userdataFacade.findByUserPhoneNumber(array.getString(i));
-          if(user!=null&&user.getGcmid()!=null){
-              list.add(user.getGcmid()); 
-              mail=new AlertMail(user.getEmail(),useremail);
-          }      
+          if(user!=null){
+             if(user.getGcmid()!=null)
+                  list.add(user.getGcmid()); 
+             if(user.getEmail()!=null){
+                 System.out.println("user email"+user.getEmail());
+                 address[i]=new InternetAddress(user.getEmail());
+             }
+          }
+        }
+        try{
+        new AlertMail(address, useremail,lcation);
+        }catch(Exception e1){
+           e1.printStackTrace();
         }
         if(list.size()>0){
              Message.Builder builder=new Message.Builder();
@@ -113,9 +127,15 @@ public class UserAlert extends HttpServlet {
              builder.timeToLive(259200);  // 3days msg will be in server
              builder.delayWhileIdle(false);
              builder.addData("msg", "I am in danger please help me");
-             builder.addData("tel", userphone);
-             builder.addData("lat", lcation.getLatitude());
-             builder.addData("long", lcation.getLongitude());
+             builder.addData("telno", userphone);
+             String _latitude="0.0";
+             String _longitude="0.0";
+             if(lcation!=null){
+                 _latitude=lcation.getLatitude();
+                 _longitude=lcation.getLongitude();
+             }
+             builder.addData("lat", _latitude);
+             builder.addData("long", _longitude);
              Message msg=builder.build();
              Sender sender=new Sender(GCM_API_KEY);
              MulticastResult mresult=sender.sendNoRetry(msg, list);

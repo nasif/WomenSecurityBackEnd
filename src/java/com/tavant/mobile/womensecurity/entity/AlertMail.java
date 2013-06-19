@@ -13,36 +13,54 @@ import javax.mail.internet.*;
 import java.util.*;
 
 public class AlertMail {
-
-      String server="smtp.gmail.com";
+ 
+      String server="smtp.gmail.com"; //74.125.129.109
+      //String server="74.125.129.109";
       String from="secure2305@gmail.com";
       String subject="This is an Alert Mail from your friend";
     
-    public AlertMail(String receiver, String useremail) {
-      
-      String message    =   "Your friend "+useremail+" is in danger. Please help";
+      String location="";
+  
+    public AlertMail(InternetAddress[] address, String useremail, Locationdata mlocation) {
+        String sender="";
+        if(useremail!=null)
+            sender=useremail.split("@")[0];
+        
+        if(mlocation!=null)
+            location=mlocation.getLocation();
+        String message    =   "Your friend "+sender+" is in danger. Please help Him. "+
+                               "He is currently at "+location+" ";
       try{
-      this.sendMail(receiver,message);
+      this.sendMail(address,message);
       }catch(Exception e){
              e.printStackTrace();
              System.out.print("Exception"+e.getMessage());
-      }
+      }  
     }
-   private void sendMail(String to,String messageBody) throws MessagingException, AddressException
+    
+    
+   private void sendMail(InternetAddress[] address,String messageBody) throws MessagingException, AddressException
      {
 
          // Setup mail server
          Properties props = System.getProperties();
          props.put("mail.smtp.host", server);
          props.put("mail.smtp.auth", "true");
+         props.put("mail.debug", "true");
+         props.put("mail.smtp.port", 25);
+         props.put("mail.smtp.starttls.enable", true);
          Authenticator  auth    =  new  SMTPAuthenticator();
 
          // Get a mail session
-         Session session = Session.getDefaultInstance(props, auth);
+         Session session =Session.getInstance(props, auth);
          // Define a new mail message
          Message message = new MimeMessage(session);
          message.setFrom(new InternetAddress(from));
-         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+         message.addRecipients(Message.RecipientType.TO, address);
+         
+       //message.addRecipient
+         
+         
          message.setSubject(subject);
          // Create a message part to represent the body text
          BodyPart messageBodyPart = new MimeBodyPart();
