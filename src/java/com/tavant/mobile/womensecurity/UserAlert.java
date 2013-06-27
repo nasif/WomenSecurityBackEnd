@@ -108,9 +108,11 @@ public class UserAlert extends HttpServlet {
         for(int i=0;i<array.size();i++){
           Userdata user=  userdataFacade.findByUserPhoneNumber(array.getString(i));
           if(user!=null){
-             if(user.getGcmid()!=null)
-                  list.add(user.getGcmid()); 
-             if(user.getEmail()!=null){
+             if(user.getGcmid()!=null){
+                  System.out.println("gcmid"+user.getGcmid());
+                  list.add(user.getGcmid());
+             } 
+             if(user.getEmail()!=null){  // only sending mail is for friends only
                  System.out.println("user email"+user.getEmail());
                  address[i]=new InternetAddress(user.getEmail());
              }
@@ -126,7 +128,11 @@ public class UserAlert extends HttpServlet {
              builder.collapseKey("collapse_key"+integer.incrementAndGet());
              builder.timeToLive(259200);  // 3days msg will be in server
              builder.delayWhileIdle(false);
-             builder.addData("msg", "I am in danger please help me");
+             String uName="";
+             if(useremail!=null){
+                 uName=useremail.split("@")[0];
+             }
+             builder.addData("msg", "The guy "+uName+" is in danger. Please Help him.");
              builder.addData("telno", userphone);
              String _latitude="0.0";
              String _longitude="0.0";

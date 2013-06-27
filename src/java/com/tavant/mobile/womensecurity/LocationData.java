@@ -110,7 +110,7 @@ public class LocationData extends HttpServlet {
               }
               String phonenumber="";
               if(apptype==0){
-                  currentlocation="Koramangala, Bangalore, Karnataka 560095, India";
+                  //currentlocation="Koramangala, Bangalore, Karnataka 560095, India";
                   phonenumber=getNearestCopnumber(currentlocation);  //Nearest cop have to give only for apptype=0,
               }
               outputString      +=  "\n<SS>TRUE</SS>";
